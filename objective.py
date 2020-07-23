@@ -37,12 +37,12 @@ class Objective:
         clf = self.clf(**params, **self.fixed_params)
 
         # ***** スコア算出法 *****
-        # if self.cv:  # CV
-        scores = cross_val_score(clf, self.X, self.y, scoring = 'r2', cv = 5)
-        score = - np.average(scores)
-        # else:   # もう一回分割
-        #     X_train1, X_train2, y_train1, y_train2 = train_test_split(self.X, self.y, test_size = 0.2, random_state = random_state)
-        #     clf.fit(X_train1, y_train1)
-        #     y_pred_on_train2 = clf.predict(X_train2)
-        #     score = - R2(y_train2, y_pred_on_train2)
+        if self.cv:  # CV
+            scores = cross_val_score(clf, self.X, self.y, scoring = 'r2', cv = 5)
+            score = - np.average(scores)
+        else:   # もう一回分割
+            X_train1, X_train2, y_train1, y_train2 = train_test_split(self.X, self.y, test_size = 0.2, random_state = random_state)
+            clf.fit(X_train1, y_train1)
+            y_pred_on_train2 = clf.predict(X_train2)
+            score = - R2(y_train2, y_pred_on_train2)
         return score
