@@ -10,7 +10,7 @@ setup(
     author='yu-9824',
     author_email='yu.9824@gmail.com',
     install_requires=install_requirements,
-    url='https://github.com/kennethreitz/samplemod',
+    url='https://github.com/yu-9824/objective',
     license=license,
-    packages=find_packages()
+    packages=find_packages(exclude=['example'])
 )
