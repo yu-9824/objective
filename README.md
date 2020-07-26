@@ -1,3 +1,25 @@
+## インストール方法
+
+### pipの場合
+
+~~~
+pip install git+https://github.com/yu-9824/objective
+~~~
+
+### anacondaの場合
+~~~
+conda install pip
+~~~
+のあと，
+~~~
+pip install git+https://github.com/yu-9824/objective
+~~~
+
+
+## 使い方
+exampleフォルダを参照．
+
+
 ## INPUT
 clf : 使う機械学習モデルのクラスを代入 (e.g. RandomForestRegressor)
 
