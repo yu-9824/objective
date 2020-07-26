@@ -14,21 +14,25 @@ from sklearn.tree import DecisionTreeRegressor
 
 class Objective:
     def __init__(self, clf, X, y, random_state = None, cv = 5):
-        self.clf = clf
+        try:
+            clf()
+            self.clf = clf
+        except:
+            self.clf = type(clf)
         self.X = X
         self.y = y
         self.cv = int(cv)
         self.random_state = random_state
 
-        if type(self.clf) == RandomForestRegressor or self.clf == RandomForestRegressor:    # clfには原則モデルのクラスを入れる想定だが，もしインスタンスを入れてしまった場合もできるようにするため．　不具合があったらどちらかのみにする．
+        if self.clf == RandomForestRegressor:    # clfには原則モデルのクラスを入れる想定だが，もしインスタンスを入れてしまった場合もできるようにするため．　不具合があったらどちらかのみにする．
             self.fixed_params = {'random_state' : self.random_state}
-        elif type(self.clf) == XGBRegressor or self.clf == XGBRegressor:
+        elif self.clf == XGBRegressor:
             self.fixed_params = {'random_state' : self.random_state, 'silent' : True, 'objective' : 'reg:squarederror'}
-        elif type(self.clf) == GradientBoostingRegressor or self.clf == GradientBoostingRegressor:
+        elif self.clf == GradientBoostingRegressor:
             self.fixed_params = {'random_state' : self.random_state, 'n_iter_no_change' : 5}
-        elif type(self.clf) == NGBRegressor or self.clf == NGBRegressor:
+        elif self.clf == NGBRegressor:
             self.fixed_params = {'random_state': self.random_state}
-        elif type(self.clf) == SVR or self.clf == SVR:
+        elif self.clf == SVR:
             self.fixed_params = {'gamma' : 'auto'}
 
     def __call__(self, trial):
@@ -82,3 +86,15 @@ class Objective:
             y_pred_on_train2 = clf.predict(X_train2)
             score = - R2(y_train2, y_pred_on_train2)
         return score
+
+if __name__ == '__main__':
+    from sklearn.datasets import load_boston
+    boston = load_boston()
+    X = np.array(boston.data)
+    y = np.array(boston.target)
+
+    objective = Objective(RandomForestRegressor(), X, y, random_state = 334, cv = 0)
+
+    import optuna
+    study = optuna.create_study()
+    study.optimize(objective, n_trials = 1)
