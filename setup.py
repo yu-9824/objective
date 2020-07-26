@@ -5,7 +5,7 @@ with open('requirements.txt') as requirements_file:
 
 setup(
     name='objective',
-    version='0.0.1',
+    version='0.0.2',
     description='objective function for optuna.',
     author='yu-9824',
     author_email='yu.9824@gmail.com',
