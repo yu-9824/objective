@@ -31,14 +31,14 @@ random_state : default(None), int．再現性のため．
 
 cv : default(5)．交差検証 (Cross Validation) の回数．cv = 0のとき，8 : 2で分割したときのテストスコアを返す．
 
-scoring : [scikit-learnの'scoring-parameter']:(https://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter) に従う．
+scoring : [scikit-learnの'scoring-parameter'](https://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter) に従う．
 
 現在使えるのは，'r2\_score', 'neg\_mean\_squared\_error', 'neg\_mean\_absolute\_error' だけ．
 
 特にr2\_scoreのときは他の二つと違って最大化方向が最適方法であり，デフォルトの最小化ではダメなので，
 
-~~~
-create_study(direction = 'maximize')
+~~~python
+study = optuna.create_study(direction = 'maximize')
 ~~~
 
 とする必要がある．
@@ -46,9 +46,7 @@ create_study(direction = 'maximize')
 ## OUTPUT
 None (何もreturnされない)
 ~~~python
-
-objective.clf(**objective.fixed_params, **study.best_params)
-
+best_model = objective.clf(**objective.fixed_params, **study.best_params)
 ~~~
 
 で最適なハイパーパラメータ の機械学習モデルを得ることができる．
@@ -66,6 +64,6 @@ for k, v in study.best_params.items():
     else:
 	sub_params[k] = v
 params['Base'] = DecisionTreeRegressor(**sub_params)
-objective.clf(**params, **objective.fixed_params)
+best_model = objective.clf(**params, **objective.fixed_params)
 ~~~
 で最適なハイパーパラメータ の機械学習モデルを得ることができる．
