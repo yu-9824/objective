@@ -1,4 +1,6 @@
-from sklearn.metrics import r2_score as R2
+from sklearn.metrics import r2_score
+from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 
@@ -13,7 +15,7 @@ from sklearn.tree import DecisionTreeRegressor
 
 
 class Objective:
-    def __init__(self, clf, X, y, random_state = None, cv = 5):
+    def __init__(self, clf, X, y, random_state = None, cv = 5, scoring = 'r2'):
         try:
             clf()
             self.clf = clf
@@ -23,6 +25,7 @@ class Objective:
         self.y = y
         self.cv = int(cv)
         self.random_state = random_state
+        self.scoring = scoring
 
         if self.clf == RandomForestRegressor:    # clfには原則モデルのクラスを入れる想定だが，もしインスタンスを入れてしまった場合もできるようにするため．　不具合があったらどちらかのみにする．
             self.fixed_params = {'random_state' : self.random_state}
@@ -78,13 +81,18 @@ class Objective:
 
         # ***** スコア算出法 *****
         if self.cv:  # CV
-            scores = cross_val_score(clf, self.X, self.y, scoring = 'r2', cv = 5)
-            score = - np.average(scores)
+            scores = cross_val_score(clf, self.X, self.y, scoring = self.scoring, cv = self.cv)
+            score = np.average(scores)
         else:   # もう一回分割
             X_train1, X_train2, y_train1, y_train2 = train_test_split(self.X, self.y, test_size = 0.2, random_state = self.random_state)
             clf.fit(X_train1, y_train1)
             y_pred_on_train2 = clf.predict(X_train2)
-            score = - R2(y_train2, y_pred_on_train2)
+            scorer = {
+                'neg_mean_absolute_error':mean_absolute_error,
+                'neg_mean_squared_error':mean_squared_error,
+                'r2':r2_score
+            }
+            score = scorer[self.scoring](y_train2, y_pred_on_train2)
         return score
 
 if __name__ == '__main__':
@@ -93,8 +101,8 @@ if __name__ == '__main__':
     X = np.array(boston.data)
     y = np.array(boston.target)
 
-    objective = Objective(RandomForestRegressor(), X, y, random_state = 334, cv = 0)
+    objective = Objective(RandomForestRegressor(), X, y, random_state = 334, cv = 0, scoring = 'r2')
 
     import optuna
-    study = optuna.create_study()
+    study = optuna.create_study(direction='maximize')   # R2スコアの場合は最大化．
     study.optimize(objective, n_trials = 1)

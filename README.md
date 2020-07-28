@@ -29,7 +29,19 @@ y : 目的変数．pd.Seriesでもnp.arrayでもOK．
 
 random_state : default(None), int．再現性のため．
 
-cv : default(5)．交差検証 (Cross Validation) の回数．cv = 0のとき，8 : 2で分割したときのスコア．
+cv : default(5)．交差検証 (Cross Validation) の回数．cv = 0のとき，8 : 2で分割したときのテストスコアを返す．
+
+scoring : [scikit-learnの'scoring-parameter']:(https://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter) に従う．
+
+現在使えるのは，'r2\_score', 'neg\_mean\_squared\_error', 'neg\_mean\_absolute\_error' だけ．
+
+特にr2\_scoreのときは他の二つと違って最大化方向が最適方法であり，デフォルトの最小化ではダメなので，
+
+~~~
+create_study(direction = 'maximize')
+~~~
+
+とする必要がある．
 
 ## OUTPUT
 None (何もreturnされない)
